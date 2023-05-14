@@ -28,19 +28,18 @@ const corsOptions = {
 //เรียกใช้งานcors
 app.use(cors(corsOptions));
 
-
 //แปลงข้อมูลเป็นjson และ encoded
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-
 async function run() {
-
   app.post("/", async (req, res) => {
     try {
+      //รับค่าจากbadyที่ถูกส่งมา
+      const data = req.body;
 
-        //รับค่าจากbadyที่ถูกส่งมา
-      const fileStr = req.body.data;
+      //แตกค่าเอาเฉพาะไฟล์รูป
+      const fileStr = req.body.profileImage;
 
       //upload API
       //https://cloudinary.com/documentation/image_upload_api_reference
@@ -50,15 +49,16 @@ async function run() {
         folder: "profile_pic",
         width: "800",
       });
+      //ยัดค่าurlเข้า obj
+      data.profileImage = uploadedResponse.url;
 
       //เช็คข้อมูลหลังupload
-      console.log(uploadedResponse);
+      console.log(data);
 
       //ส่งข้อความไปหาclient
       res.json({ msg: "Upload complete" });
     } catch (error) {
-
-        //ดักerror
+      //ดักerror
       console.error(error);
       res.status(500).json({ err: "Something went wrong" });
     }
@@ -72,4 +72,4 @@ async function run() {
     console.log(`Address: http://${ipAddress}:${port}`);
   });
 }
-run()
+run();
